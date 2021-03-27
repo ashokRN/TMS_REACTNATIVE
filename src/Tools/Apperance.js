@@ -1,6 +1,9 @@
 export default {
-  background: '#2d9a74',
+  // background: '#be62f1',
+  background:"#551B89",
   fontFamily: 'Montserrat-Regular',
+  fontFamily: 'Montserrat-Regular',
+  fontFamilyBold: 'Montserrat-SemiBold',
   color: '#000000',
 };
 

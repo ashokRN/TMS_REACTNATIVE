@@ -8,6 +8,7 @@ import API from '../../services/API.service';
 import {GlobalContext} from '../../global/GlobalStore';
 import Tools from '../../Tools/Tools';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import Apperance from '../../Tools/Apperance';
 
 const Login = () => {
   const {StateDispatch} = useContext(GlobalContext);
@@ -16,21 +17,29 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const onSubmitHandler = async (userId, pass) => {
-    let hash = await Tools.encrpt(userId, pass);
-    if (hash) {
-      let response = await API.login(hash);
-      if (response.success === true) {
-        let user = await API.getUserDetail(response.userid);
-        if (user) {
-          await AsyncStorage.setItem(
-            'user',
-            JSON.stringify({...response, user}),
-          );
-          await StateDispatch({
-            type: 'AUTH',
-            user: {...response, user},
-          });
+    let body = {userName: userId, password: pass};
+    let response;
+    try {
+      response = await API.login(body);
+      if (response) {
+        let response2;
+        try {
+          response2 = await API.getUser(response.token);
+          if (response2) {
+            await AsyncStorage.setItem(
+              'user',
+              JSON.stringify({...response2.User, token: response.token}),
+            );
+            await StateDispatch({
+              type: 'AUTH',
+              user: {...response2.User, token: response.token},
+            });
+            () => navigation.navigate('Home');
+          }
+        } catch (error) {
+          throw error;
         }
+        
       } else {
         await setLoading(false);
         await setError({
@@ -38,6 +47,8 @@ const Login = () => {
           fileds: ['username', 'password'],
         });
       }
+    } catch (error) {
+      throw error;
     }
   };
   const onValidateHandler = async () => {
@@ -62,6 +73,7 @@ const Login = () => {
 
   return (
     <View style={style.loginContainer}>
+      
       <View style={{marginVertical: 10}}>
         <ImageBox
           data={require('../../assets/logo.png')}
@@ -69,9 +81,16 @@ const Login = () => {
           height={200}
         />
       </View>
+      <View style={{paddingVertical:30}}>
+        <Text style={{
+          color:'#fff',
+          fontFamily:Apperance.fontFamilyBold,
+          fontSize:40
+        }}>Hyena</Text>
+      </View>
       <View style={{marginVertical: 15}}>
         {error.error !== '' && (
-          <Text style={{color: '#be62f1', fontSize: 14, letterSpacing: 1.5}}>
+          <Text style={{color: Apperance.background, fontSize: 14, letterSpacing: 1.5}}>
             {error.error}
           </Text>
         )}
@@ -97,26 +116,26 @@ const Login = () => {
       </View>
       <View style={{width: 320, top: 45}}>
         {loading ? (
-          <Indicator size={'large'} color={'#be62f1'} />
+          <Indicator size={'large'} color={'#fff'} />
         ) : (
           <TouchableOpacity
             onPress={() => onValidateHandler()}
             style={{
-              justifyContent:"center",
-              alignItems:"center",
-              backgroundColor: '#be62f1',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: Apperance.background,
               width: '100%',
-              borderRadius: 30,
+              borderRadius: 8,
               padding: 12,
-              borderWidth: 0.8,
-              borderColor: '#be62f1',
+              borderWidth: 1.5,
+              borderColor: '#fff',
               elevation: 5,
             }}>
             <View>
               <Text
                 style={{
                   letterSpacing: 1.5,
-                  fontSize: 12,
+                  fontSize: 18,
                   fontWeight: 'bold',
                   color: '#fff',
                 }}>
@@ -137,7 +156,7 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: Apperance.background,
+    padding: 10,
   },
 });

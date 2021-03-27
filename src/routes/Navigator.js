@@ -5,7 +5,7 @@ import Login from '../screens/Auth/Login';
 import {GlobalContext} from '../global/GlobalStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeNavigation from './HomeNavigation/HomeNavigation';
-import API from '../services/API.service';
+import API, {getUser} from '../services/API.service';
 
 const Stack = createStackNavigator();
 
@@ -24,14 +24,18 @@ const Navigator = ({navigation}) => {
       value = await AsyncStorage.getItem('user');
       if (value) {
         let userData = JSON.parse(value);
-        let user = await API.getUserDetail(userData.userid);
-        if (user) {
-          await AsyncStorage.setItem(
-            'user',
-            JSON.stringify({...userData, user}),
-          );
-          await StateDispatch({type: 'AUTH', user: {...userData, user}});
-          () => navigation.navigate('Home');
+        let response;
+        try {
+          response = await getUser(userData.token);
+          if (response) {
+            await StateDispatch({
+              type: 'AUTH',
+              user: {...response.User, token: userData.token},
+            });
+            () => navigation.navigate('Home');
+          }
+        } catch (error) {
+          throw error;
         }
       }
     } catch (error) {

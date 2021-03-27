@@ -1,60 +1,22 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import {StyleSheet, Text, View, Image} from 'react-native';
 import Apperance from '../../Tools/Apperance';
+import UserNavigation from '../UserNavigation/UserNavigation'
 
 const HomeStack = createStackNavigator();
 
-const HeaderLeft = () => (
-  <Image
-    source={require('../../assets/pwdlogo.png')}
-    style={{width: 60, height: 60, marginHorizontal: 20}}
-  />
-);
-const HeaderRight = () => (
-  <FontAwesome5Icon
-    onPress={() => logOut()}
-    style={{marginRight: 30}}
-    name={'filter'}
-    size={20}
-    color={'#006600'}
-  />
-);
-const HeaderTitle = () => {
-  return (
-    <View style={style.headerTitleContainer}>
-      <Text style={style.headerManiText}>
-        {'Public Work Department'.toUpperCase()}
-      </Text>
-      <Text style={style.headerSmallText}>( Tamil Nadu )</Text>
-    </View>
-  );
-};
-const HomeNavigation = () => {
-  const screenOptions = {
-    headerStyle: {
-      // backgroundColor: Apperance.background,
-      backgroundColor: '#FFFFFF',
-      height: 80,
-      // elevation: 0,
-    },
-    headerRight: () => <HeaderRight />,
-    headerTitle: () => <HeaderTitle />,
-    headerLeft: () => <HeaderLeft />,
-  };
 
+const HomeNavigation = () => {
   return (
     <HomeStack.Navigator
-      screenOptions={screenOptions}
+      screenOptions={{
+        headerShown:false
+      }}
       initialRouteName={'Home'}>
       <HomeStack.Screen
         name={'Home'}
-        component={() => (
-          <View>
-            <Text>Hello</Text>
-          </View>
-        )}
+        component={UserNavigation}
       />
     </HomeStack.Navigator>
   );
